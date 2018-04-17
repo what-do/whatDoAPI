@@ -5,6 +5,17 @@ var TagSchema = new mongoose.Schema({
   title: String
 },{ _id : false });
 
+var AddressSchema = new mongoose.Schema({
+    address1: String,
+    address2: String,
+  	address3: String,
+    city: String,
+    state: String,
+  	country: String,	    
+    zip_code: String,
+    display_address: [String]
+},{ _id : false });
+
 var ActivitySchema = new mongoose.Schema({  
   name: String,
   type: String,
@@ -12,15 +23,7 @@ var ActivitySchema = new mongoose.Schema({
   description: String,
   yelp: String,
   tags: [TagSchema],
-  address: [{
-  	city: String,
-  	country: String,	
-  	address2: String,
-  	address3: String,
-    state: String,
-    address1: String,
-    zip_code: String
-  }],
+  address: [AddressSchema]
 });
 mongoose.model('Activity', ActivitySchema);
 module.exports = mongoose.model('Activity');
