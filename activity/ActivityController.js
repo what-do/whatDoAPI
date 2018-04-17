@@ -22,6 +22,7 @@ router.post("/", function (req, res) {
 			if(err) return res.status(500).send("There was a problem adding the information to the database.");
             addTags(JSON.parse(req.body.tags), activity);
             activity.address.push(JSON.parse(req.body.address));
+            activity.save();
             res.status(200).send(activity);
 		}
 	);
