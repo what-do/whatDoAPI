@@ -20,6 +20,14 @@ router.post("/", function (req, res) {
 		},
 		function(err, activity) {
 			if(err) return res.status(500).send("There was a problem adding the information to the database.");
+
+            Activity.remove({name: activity.name, address: activity.address}, 
+                function(err){
+                    if(err){
+                        res.status(500).send('There was an error removing a previous entry: ' + err.message);
+                    }
+                });
+
             addTags(JSON.parse(req.body.tags), activity);
             activity.address.push(JSON.parse(req.body.address));
             activity.save();
