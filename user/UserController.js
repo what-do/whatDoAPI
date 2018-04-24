@@ -10,20 +10,30 @@ var User = require('./User');
 router.post("/", function (req, res) {
 	User.create(
 		{
-		name: req.body.name,
+		_id: req.body.id,
+        username: req.body.username,
 		email: req.body.email,
-		password: req.body.password
-        /*
-        Push interests (request from user in setup)
-        interests: [{type: String}],
-        */
+		password: req.body.password,
+        friends: [],
+        interests: [],
+        likes: [],
+        dislikes: []
 		},
 		function(err, user) {
 			if(err) return res.status(500).send("There was a problem adding the information to the database.");
+            console.log(req.body.interests);
+            addInterests(JSON.parse(req.body.interests), user);
+            user.save();
             res.status(200).send(user);
 		}
 	);
 });
+
+function addInterests(parsedInterests, user){
+    for(var i = 0; i < parsedInterests.length; i++) {
+        user.interests.push(parsedInterests[i]);
+    }
+}
 
 //Returns all Users in DB
 router.get('/', function (req, res) {
@@ -53,14 +63,34 @@ router.delete('/:id', function (req, res) {
     });
 });
 
-//Updates a User in DB
-router.put('/:id', function (req, res) {
-    User.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, user) {
-        //Implement how to add friends, likes, dislikes, and interests
+//Updates a User's password in DB
+router.put('/password/:id', function (req, res) {
+    var update = { password: req.body.password };
+    User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
         if (err) return res.status(500).send("There was a problem updating the user.");
         if (!user) return res.status(404).send("No user found.");
         res.status(200).send(user);
     });
 });
+
+//Updates a User's interests in DB
+router.put('/interests/:id', function (req, res) {
+    if(req.body.interests){
+        parsedInterests = JSON.parse(req.body.interests);
+        interests = [];
+        for(var i = 0; i < parsedInterests.length; i++) {
+            interests.push(parsedInterests[i]);
+        }
+    }
+
+    var update = { $push: {"interests" : interests }};
+    
+    User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
+        if (err) return res.status(500).send("There was a problem updating the user.");
+        if (!user) return res.status(404).send("No user found.");
+        res.status(200).send(user);
+    });
+});
+
 
 module.exports = router;

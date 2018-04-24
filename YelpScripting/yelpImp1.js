@@ -1,9 +1,6 @@
 var https = require('https');
 var queryString = require('querystring');
 
-
-
-
 _term = process.argv[2];
 
 function doSearch(term, ofs){
@@ -97,7 +94,7 @@ const options = {
 };
 
 const req = https.request(options, (res) => {
-  console.log(`STATUS: ${res.statusCode}`);
+  //console.log(`STATUS: ${res.statusCode}`);
   res.setEncoding('utf8');
   res.on('data', (chunk) => {
     //console.log(`BODY: ${chunk}`);
@@ -124,5 +121,3 @@ function sleep(milliseconds) {
     }
   }
 }
-
-

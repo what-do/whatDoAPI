@@ -1,4 +1,4 @@
 cron:
 - description: "update yelp database"
-  url: /tasks/update_yelp
-  schedule: every 2 minutes
+  url: /tasks/yelpScript
+  schedule: every 24 hours
