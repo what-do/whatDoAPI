@@ -3,7 +3,6 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-
 var User = require('./User');
 
 //Creates a new User
@@ -75,22 +74,46 @@ router.put('/password/:id', function (req, res) {
 
 //Updates a User's interests in DB
 router.put('/interests/:id', function (req, res) {
+
+
+    interests = [];
+
     if(req.body.interests){
-        parsedInterests = JSON.parse(req.body.interests);
-        interests = [];
-        for(var i = 0; i < parsedInterests.length; i++) {
-            interests.push(parsedInterests[i]);
-        }
+        query = User.findById(req.params.id);
+        query.then(function(user){ 
+            parsedInterests = JSON.parse(req.body.interests);    
+            for(let i = 0; i < parsedInterests.length; i++) {
+                    var newInterest = true;
+                    for(var j = 0; j < user.interests.length; j++){
+                        console.log('Comparing ' + parsedInterests[i] + ' to ' + user.interests[j]);
+                        if(parsedInterests[i] == user.interests[j]){
+                            console.log('Interest exists');
+                            newInterest = false;
+                        }
+                    }
+                    if(newInterest){
+                        interests.push(parsedInterests[i]);
+                        console.log(interests);
+                    }
+            }
+            var update = { $push: {"interests" : interests }};
+        
+            User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
+                if (err) return res.status(500).send("There was a problem updating the user.");
+                if (!user) return res.status(404).send("No user found.");
+                res.status(200).send(user);
+            });
+        });
     }
-
-    var update = { $push: {"interests" : interests }};
-    
-    User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
-        if (err) return res.status(500).send("There was a problem updating the user.");
-        if (!user) return res.status(404).send("No user found.");
-        res.status(200).send(user);
-    });
 });
+/*
+    var query = Band.findOne({name: "Guns N' Roses"});
+    assert.ok(!(query instanceof Promise));
 
+    // A query is not a fully-fledged promise, but it does have a `.then()`.
+    query.then(function (doc) {
+      // use doc
+    });
+*/
 
 module.exports = router;
