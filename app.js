@@ -8,7 +8,7 @@ app.use('/users', UserController);
 var ActivityController = require('./activity/ActivityController');
 app.use('/activities', ActivityController);
 
-var YelpHandler = require('./YelpScripting/yelpHandler1');
-app.use('/tasks/yelpScript', YelpHandler);
+//var YelpHandler = require('./YelpScripting/yelpHandler1');
+//app.use('/tasks/yelpScript', YelpHandler);
 
 module.exports = app;

@@ -72,15 +72,14 @@ router.put('/password/:id', function (req, res) {
     });
 });
 
-//Updates a User's interests in DB
-router.put('/interests/:id', function (req, res) {
-
-
+//Adds User interests to DB
+router.put('/addinterests/:id', function (req, res) {
     interests = [];
 
     if(req.body.interests){
         query = User.findById(req.params.id);
         query.then(function(user){ 
+            if (!user) return res.status(404).send("No user found.");
             parsedInterests = JSON.parse(req.body.interests);    
             for(let i = 0; i < parsedInterests.length; i++) {
                     var newInterest = true;
@@ -100,20 +99,25 @@ router.put('/interests/:id', function (req, res) {
         
             User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
                 if (err) return res.status(500).send("There was a problem updating the user.");
-                if (!user) return res.status(404).send("No user found.");
                 res.status(200).send(user);
             });
         });
     }
 });
-/*
-    var query = Band.findOne({name: "Guns N' Roses"});
-    assert.ok(!(query instanceof Promise));
 
-    // A query is not a fully-fledged promise, but it does have a `.then()`.
-    query.then(function (doc) {
-      // use doc
-    });
-*/
+//Removes User interests from DB
+router.put('/removeinterests/:id', function (req, res) {
+    if(req.body.interests){
+        query = User.findById(req.params.id);
+        query.then(function(user){ 
+            if (!user) return res.status(404).send("No user found.");
+            parsedInterests = JSON.parse(req.body.interests);    
+            for(let i = 0; i < parsedInterests.length; i++) {
+                user.interests.remove(parsedInterests[i]);
+                user.save();
+            }
+        });
+    }
+});
 
 module.exports = router;

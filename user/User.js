@@ -4,7 +4,7 @@ var Activity = require('../activity/Activity');
 
 var UserSchema = new mongoose.Schema({  
   _id: Number,
-  name: String,
+  username: String,
   email: String,
   password: String,
   friends: [String],
