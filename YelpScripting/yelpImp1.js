@@ -1,4 +1,5 @@
 var https = require('https');
+var http = require('http');
 var queryString = require('querystring');
 
 _term = process.argv[2];
@@ -16,7 +17,7 @@ function doSearch(term, ofs){
     }
   };
 
-  
+  //console.log('still here');
 
   const req = https.request(options, (res) => { 
 
@@ -83,8 +84,10 @@ function pushResult(result){
   console.log("========================================");
 
 const options = {
-  hostname: 'civil-ivy-200504.appspot.com',
-  port: 443,
+  // hostname: 'civil-ivy-200504.appspot.com',
+  // port: 443,
+  hostname: 'localhost',
+  port: 3000,
   path: '/activities',
   method: 'POST',
   headers: {
@@ -93,14 +96,14 @@ const options = {
   }
 };
 
-const req = https.request(options, (res) => {
+const req = http.request(options, (res) => {
   //console.log(`STATUS: ${res.statusCode}`);
   res.setEncoding('utf8');
   res.on('data', (chunk) => {
     //console.log(`BODY: ${chunk}`);
   });
   res.on('end', () => {
-    console.log('');
+    //console.log('');
   });
 });
 

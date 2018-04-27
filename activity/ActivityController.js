@@ -5,11 +5,12 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 var Activity = require('./Activity');
+var Tag = require('../tag/Tag');
 
 //Creates a new Activity
 router.post("/", function (req, res) {
     Activity.remove({yelp: req.body.yelp}, function(err){
-        console.log('Removed activity ' + req.body.name);
+        //console.log('Removed activity ' + req.body.name);
         if(err){
             res.status(500).send('There was an error removing a previous entry: ' + err.message);
         }
@@ -30,7 +31,8 @@ router.post("/", function (req, res) {
             addTags(JSON.parse(req.body.tags), activity);
             activity.address.push(JSON.parse(req.body.address));
             activity.save();
-            console.log('Added activity ' + req.body.name);
+
+            //console.log('Added activity ' + req.body.name);
             res.status(200).send(activity);
 		}
 	);
@@ -39,6 +41,19 @@ router.post("/", function (req, res) {
 function addTags(parsedTags, activity){
     for(var i = 0; i < parsedTags.length; i++) {
         activity.tags.push(parsedTags[i]);
+        console.log('hello');
+        // var query = Tag.findOne({alias: parsedTags[i].alias});
+        // query.then(function(tag){
+        //     console.log(tag);
+        //     if(tag){
+        //         tag.weight = tag.weight + 1;
+        //         tag.save();
+        //     }
+        // });     
+        var update = {$inc: 'weight'};
+        Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
+            console.log(tag);
+        });
     }
 }
 

@@ -8,6 +8,9 @@ app.use('/users', UserController);
 var ActivityController = require('./activity/ActivityController');
 app.use('/activities', ActivityController);
 
+var TagController = require('./tag/TagController');
+app.use('/tags', TagController);
+
 //var YelpHandler = require('./YelpScripting/yelpHandler1');
 //app.use('/tasks/yelpScript', YelpHandler);
 
