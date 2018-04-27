@@ -83,6 +83,15 @@ router.put('/email/:id', function (req, res) {
     }
 });
 
+//Returns User interests
+router.get('/interests/:id', function (req, res) {
+    User.findById(req.params.id, 'interests', function (err, user) {
+        if (err) return res.status(500).send("There was a problem finding the user.");
+        if (!user) return res.status(404).send("No user found.");
+        res.status(200).send(JSON.stringify(user.interests));
+    });
+});
+
 //Adds User interests to DB
 router.put('/addinterests/:id', function (req, res) {
     interests = [];
@@ -91,7 +100,7 @@ router.put('/addinterests/:id', function (req, res) {
         query = User.findById(req.params.id);
         query.then(function(user){ 
             if (!user){
-                //return res.status(404).send("No user found.");
+                return res.status(404).send("No user found.");
             }
             parsedInterests = JSON.parse(req.body.interests);    
             for(let i = 0; i < parsedInterests.length; i++) {
