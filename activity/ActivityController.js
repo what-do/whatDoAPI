@@ -30,6 +30,7 @@ router.post("/", function (req, res) {
             addTags(JSON.parse(req.body.tags), activity);
             activity.address.push(JSON.parse(req.body.address));
             activity.save();
+            console.log('Added activity ' + req.body.name);
             res.status(200).send(activity);
 		}
 	);

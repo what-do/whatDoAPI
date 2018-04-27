@@ -84,15 +84,12 @@ router.put('/addinterests/:id', function (req, res) {
             for(let i = 0; i < parsedInterests.length; i++) {
                     var newInterest = true;
                     for(var j = 0; j < user.interests.length; j++){
-                        console.log('Comparing ' + parsedInterests[i] + ' to ' + user.interests[j]);
-                        if(parsedInterests[i] == user.interests[j]){
-                            console.log('Interest exists');
+                        if(parsedInterests[i].toLowerCase() == user.interests[j]){
                             newInterest = false;
                         }
                     }
                     if(newInterest){
-                        interests.push(parsedInterests[i]);
-                        console.log(interests);
+                        interests.push(parsedInterests[i].toLowerCase());
                     }
             }
             var update = { $push: {"interests" : interests }};
@@ -108,14 +105,15 @@ router.put('/addinterests/:id', function (req, res) {
 //Removes User interests from DB
 router.put('/removeinterests/:id', function (req, res) {
     if(req.body.interests){
-        query = User.findById(req.params.id);
-        query.then(function(user){ 
+        User.findById(req.params.id, function (err, user) {
+            if (err) return res.status(500).send("There was a problem finding the user.");
             if (!user) return res.status(404).send("No user found.");
             parsedInterests = JSON.parse(req.body.interests);    
             for(let i = 0; i < parsedInterests.length; i++) {
                 user.interests.remove(parsedInterests[i]);
-                user.save();
             }
+            user.save();
+            res.status(200).send(user);
         });
     }
 });
