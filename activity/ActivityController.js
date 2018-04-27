@@ -50,7 +50,7 @@ function addTags(parsedTags, activity){
         //         tag.save();
         //     }
         // });     
-        var update = {$inc: 'weight'};
+        var update = {$inc: {'weight': 1}};
         Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
             console.log(tag);
         });
