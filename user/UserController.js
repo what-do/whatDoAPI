@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
+var Activity = require('../activity/Activity');
 
 //Creates a new User
 router.post("/", function (req, res) {
@@ -141,6 +142,73 @@ router.put('/removeinterests/:id', function (req, res) {
         });
     } else{
         res.status(404).send("No interests to remove received.");
+    }
+});
+
+//Returns User likes
+router.get('/likes/:id', function (req, res) {
+    User.findById(req.params.id, 'likes', function (err, user) {
+        if (err) return res.status(500).send("There was a problem finding the user.");
+        if (!user) return res.status(404).send("No user found.");
+        var likes = [];
+
+        for (var i = 0; i < user.likes.length; i++) {
+            (function(cntr) {
+                Activity.findOne({ 'yelp': user.likes[cntr]}, function(err, activity){
+                    likes.push(activity);
+                    if(cntr == user.likes.length-1){
+                        res.status(200).send(likes);
+                    }
+                });
+            })(i);
+        }
+
+        if(user.likes.length == 0) res.status(200).send([]);
+    });
+});
+
+//Adds User like to DB
+router.put('/addlike/:id', function (req, res) {
+    if(req.body.like){
+        query = User.findById(req.params.id);
+        query.then(function(user){ 
+            if (!user){
+                return res.status(404).send("No user found.");
+            }
+            var newLike = true;
+            for(var j = 0; j < user.likes.length; j++){
+                if(req.body.like == user.likes[j]){
+                    newLike = false;
+                }
+            }
+            if(newLike){
+                var update = { $push: {"likes" : req.body.like}};
+                User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
+                    if (err) return res.status(500).send("There was a problem updating the user.");
+                    res.status(200).send(user);
+                });
+            } else{
+                res.status(404).send("User already liked the activity.");
+            }      
+
+        });
+    } else{
+        res.status(404).send("No like to add received.");
+    }
+});
+
+//Removes User like from DB
+router.put('/removelike/:id', function (req, res) {
+    if(req.body.like){
+        User.findById(req.params.id, function (err, user) {
+            if (err) return res.status(500).send("There was a problem finding the user.");
+            if (!user) return res.status(404).send("No user found.");
+            user.likes.remove(req.body.like);
+            user.save();
+            res.status(200).send(user);
+        });
+    } else{
+        res.status(404).send("No like to remove received.");
     }
 });
 
