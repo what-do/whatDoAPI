@@ -7,25 +7,30 @@ var User = require('./User');
 
 //Creates a new User
 router.post("/", function (req, res) {
-	User.create(
-		{
-		_id: req.body.id,
-        username: req.body.username,
-		email: req.body.email,
-		password: req.body.password,
-        friends: [],
-        interests: [],
-        likes: [],
-        dislikes: []
-		},
-		function(err, user) {
-			if(err) return res.status(500).send("There was a problem adding the information to the database.");
-            console.log(req.body.interests);
-            addInterests(JSON.parse(req.body.interests), user);
-            user.save();
-            res.status(200).send(user);
-		}
-	);
+    query = User.findById(req.body.id);
+    query.then(function (user) {
+        if (user) return res.status(404).send("User with given id already exists.");
+        query = User.findOne({ 'username': req.body.username});
+        query.then(function (user) {
+            if (user) return res.status(404).send("Username " + user.username + " taken.");
+            User.create(
+                {
+                    _id: req.body.id,
+                    username: req.body.username,
+                    email: req.body.email,
+                    friends: [],
+                    interests: [],
+                    likes: [],
+                    dislikes: []
+                }, function(err, user) {
+                    if(err) return res.status(500).send("There was a problem adding the information to the database.");
+                    if(req.body.interests) addInterests(JSON.parse(req.body.interests), user);
+                    user.save();
+                    res.status(200).send(user);
+                }
+            );
+        });
+    });
 });
 
 function addInterests(parsedInterests, user){
@@ -37,10 +42,10 @@ function addInterests(parsedInterests, user){
 //Returns all Users in DB
 router.get('/', function (req, res) {
     User.find({}, 
-    	function (err, users) {
-        	if (err) return res.status(500).send("There was a problem finding the users.");
-        	res.status(200).send(users);
-    	}
+        function (err, users) {
+            if (err) return res.status(500).send("There was a problem finding the users.");
+            res.status(200).send(users);
+        }
     );
 });
 
@@ -53,23 +58,29 @@ router.get('/:id', function (req, res) {
     });
 });
 
-//Deletes a User in DB
+//Deletes a User from DB
 router.delete('/:id', function (req, res) {
     User.findByIdAndRemove(req.params.id, function (err, user) {
         if (err) return res.status(500).send("There was a problem deleting the user.");
         if (!user) return res.status(404).send("No user found.");
-        res.status(200).send("User "+ user.name +" was deleted.");
+        res.status(200).send("User "+ user.username +" was deleted.");
     });
 });
 
-//Updates a User's password in DB
-router.put('/password/:id', function (req, res) {
-    var update = { password: req.body.password };
-    User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
-        if (err) return res.status(500).send("There was a problem updating the user.");
-        if (!user) return res.status(404).send("No user found.");
-        res.status(200).send(user);
-    });
+//Updates User email in DB
+router.put('/email/:id', function (req, res) {
+    if(req.body.email){
+        console.log('attempting to add email ' + req.body.email);
+        var update = { email: req.body.email };
+        User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
+            if (err) return res.status(500).send("There was a problem updating the user.");
+            if (!user) return res.status(404).send("No user found.");
+            console.log(user.email);
+            res.status(200).send(user);
+        });
+    } else{
+        res.status(404).send("No email update received.");
+    }
 });
 
 //Adds User interests to DB
@@ -79,7 +90,9 @@ router.put('/addinterests/:id', function (req, res) {
     if(req.body.interests){
         query = User.findById(req.params.id);
         query.then(function(user){ 
-            if (!user) return res.status(404).send("No user found.");
+            if (!user){
+                //return res.status(404).send("No user found.");
+            }
             parsedInterests = JSON.parse(req.body.interests);    
             for(let i = 0; i < parsedInterests.length; i++) {
                     var newInterest = true;
@@ -99,6 +112,8 @@ router.put('/addinterests/:id', function (req, res) {
                 res.status(200).send(user);
             });
         });
+    } else{
+        res.status(404).send("No interests to add received.");
     }
 });
 
@@ -115,6 +130,8 @@ router.put('/removeinterests/:id', function (req, res) {
             user.save();
             res.status(200).send(user);
         });
+    } else{
+        res.status(404).send("No interests to remove received.");
     }
 });
 
