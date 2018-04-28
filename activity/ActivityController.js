@@ -41,15 +41,7 @@ router.post("/", function (req, res) {
 function addTags(parsedTags, activity){
     for(var i = 0; i < parsedTags.length; i++) {
         activity.tags.push(parsedTags[i]);
-        console.log('hello');
-        // var query = Tag.findOne({alias: parsedTags[i].alias});
-        // query.then(function(tag){
-        //     console.log(tag);
-        //     if(tag){
-        //         tag.weight = tag.weight + 1;
-        //         tag.save();
-        //     }
-        // });     
+        //console.log('hello');        
         var update = {$inc: {'weight': 1}};
         Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
             console.log(tag);
