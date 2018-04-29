@@ -135,7 +135,7 @@ function doSearch(){
   for(var i in searchTerms){
     //sleep(1000);
     var term = searchTerms[i];
-    ls = spawn('node', ['./yelpImp1.js', term]);
+    ls = spawn('node', ['./yelpScripting/yelpImp1.js', term]);
     ls.stdout.on('data', (data) => {
     console.log(""+data);
   });
@@ -163,5 +163,7 @@ function doSearch(){
     }
   }
 
-  module.exports = router;
+
 }
+
+  module.exports = router;
