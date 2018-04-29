@@ -190,20 +190,25 @@ router.put('/addlike/:id', function (req, res) {
 
                 //Find activites, add to tagLikes  
                 User.findById(req.params.id, function(user){
-                    Activity.findOne({'yelp': req.body.like}, function(activity){
-                        for(var i in activity.tags){
-                            var found = false;
-                            for(var tag in user.tagLikes){
-                                if(tag.tag.equals(activity.tags[i].alias)){
-                                    tag.amount ++;
-                                    found = true;
+                    Activity.findOne({"yelp": req.body.like}, function(activity){
+                        if(activity){
+                            for(var i in activity.tags){
+                                var found = false;
+                                for(var tag in user.tagLikes){
+                                    if(tag.tag.equals(activity.tags[i].alias)){
+                                        tag.amount ++;
+                                        found = true;
+                                    }
+                                }
+                                if(!found){
+                                    user.tagLikes.push({'tag': activity.tags[i].alias, 'amount': 1});
                                 }
                             }
-                            if(!found){
-                                user.tagLikes.push({'tag': activity.tags[i].alias, 'amount': 1});
-                            }
+                            user.save();
                         }
-                        user.save();
+                        else{
+                            console.log("No matching activity found: " + req.body.like);
+                        }
                     });                    
                 });
 
