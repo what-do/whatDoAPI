@@ -1,25 +1,29 @@
+var User = require('./User');
+var Activity = require('../activity/Activity');
+var Tag = require('../tag/Tag');
+
 const THRESHOLD_VAL = 0;
 const MAX_WEIGHT_BY_NUM_ACTIVITIES = 0;
 
+module.exports = {
+    getItems: function(userId, res){
+        User.findById(userId, function (err, user) {
+            if (err) return res.status(500).send("There was a problem finding the user.");
+            if (!user) return res.status(404).send("No user found.");
+            
+            var probArray = [];
 
-function getItems(userId){
-	User.findById(userId, function (err, user) {
-        if (err) return res.status(500).send("There was a problem finding the user.");
-        if (!user) return res.status(404).send("No user found.");
+            updateUserTagWeights(user, probArray);
 
-        
-        var probArray;
+            populateWeights(user, probArray);
 
-        updateUserTagWeights(user, probArray);
+        });
+    }
+};
 
-        populateWeights(user, probArray);
-
-    });
-}
-
-updateUserTagWeights(user, probArray){ //Populate an array with tag names based on user likes
-   for(var i=0; i<user.tagLikes.length;i++){
-        for(var j=0;j<user.tagLikes[i].amount){
+function updateUserTagWeights(user, probArray){ //Populate an array with tag names based on user likes
+   for(var i=0; i<user.tagLikes.length; i++){
+        for(var j=0; j<user.tagLikes[i].amount; j++){
             probArray.push(user.tagLikes[i].tag);
         }
    } 
@@ -30,10 +34,10 @@ function getRandomArbitrary(min, max) {
 }
 
 function populateWeights(user, probArray){ //Populate an array with tag names based on the weight of the tag
-    Tags.find({},function(err, tags){
+    Tag.find({},function(err, tags){
             for(var i=0; i<tags.length; i++){
                 if(tags[i].weight>=THRESHOLD_VAL){
-                    if(tags[i]weight<MAX_WEIGHT_BY_NUM_ACTIVITIES){
+                    if(tags[i].weight<MAX_WEIGHT_BY_NUM_ACTIVITIES){
                         for(var j=0; j<tags[i].weight; j++){
                             probArray.push(tags[i]);
                         }
@@ -50,8 +54,9 @@ function populateWeights(user, probArray){ //Populate an array with tag names ba
 
     });
 }
+
 function getActivity(probArray){
-    Activity.find({},{'lean':true},function(err,activities){
+    Activity.find({},function(err,activities){
         if(err){
             console.log(err);
         }
@@ -60,9 +65,10 @@ function getActivity(probArray){
         while(i<20){ //Choose 20 items
             var index = getRandomArbitrary(0,probArray.length-i); //Choose a random tag
             var taggedActivities;
+            console.log(activities);
             for(var j in activities){ //Find all activities with this tag
-                for(var k=0;k<activites[j].tags.length){
-                    if(activites[j].tags[k].alias.equals(probArray[i])){
+                for(var k=0;k<activities[j].tags.length; k++){
+                    if(activities[j].tags[k].alias.equals(probArray[i])){
                         taggedActivities.push(activities[j]);
                     }
                 }

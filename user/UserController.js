@@ -5,6 +5,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 var Activity = require('../activity/Activity');
+var pullAlgorithm = require('./pullAlgorithm');
 
 //Creates a new User
 router.post("/", function (req, res) {
@@ -233,8 +234,8 @@ router.put('/removelike/:id', function (req, res) {
 });
 
 //Returns activities to populate user feed
-router.get('/activites/:id', function (req, res) {
-    getItems(req.params.id);
+router.get('/activities/:id', function (req, res) {
+    pullAlgorithm.getItems(req.params.id, res);
 });
 
 module.exports = router;
