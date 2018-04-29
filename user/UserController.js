@@ -232,4 +232,9 @@ router.put('/removelike/:id', function (req, res) {
     }
 });
 
+//Returns activities to populate user feed
+router.get('/activites/:id', function (req, res) {
+    getItems(req.params.id);
+});
+
 module.exports = router;
