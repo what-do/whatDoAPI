@@ -24,7 +24,7 @@ router.post("/", function (req, res) {
               //if(err) console.log(err.message);
               if(!oldTag){
                 Tag.create({alias: split[cntr], weight: 0}, function(err, tag){
-                    //if(err) console.log(err.message);
+                    if(err) return res.status(500).send("There was a problem adding the tag."); 
                     tag.save();                
                 });
               }
