@@ -29,8 +29,16 @@ router.post("/", function (req, res) {
 		function(err, activity) {
 			if(err) return res.status(500).send("There was a problem adding the information to the database.");
             addTags(JSON.parse(req.body.tags), activity);
-            activity.address.push(JSON.parse(req.body.address));
-            activity.save();
+            try{
+                activity.address.push(JSON.parse(req.body.address));
+                    activity.save().catch(function(error){
+                        //console.log(error);
+                    });
+            }
+            catch(error){
+                console.log(error);
+            }
+            
 
             //console.log('Added activity ' + req.body.name);
             res.status(200).send(activity);
@@ -42,10 +50,10 @@ function addTags(parsedTags, activity){
     for(var i = 0; i < parsedTags.length; i++) {
         activity.tags.push(parsedTags[i]);
         //console.log('hello');        
-        var update = {$inc: {'weight': 1}};
-        Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
-            console.log(tag);
-        }).catch();
+        // var update = {$inc: {'weight': 1}};
+        // Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
+        //     //console.log(tag);
+        // }).catch();
     }
 }
 
