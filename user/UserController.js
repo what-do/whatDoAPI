@@ -190,20 +190,21 @@ router.put('/addlike/:id', function (req, res) {
 
                 //Find activites, add to tagLikes  
                 User.findById(req.params.id, function(user){
-                    for(var i in req.params.tags){
-                        var found = false;
-                        for(var tag in user.tagLikes){
-                            if(tag.tag.equals(req.params.tags[i]){
-                                tag.amount ++;
-                                found = true;
+                    Activity.findOne({'yelp': req.body.like}, function(activity){
+                        for(var i in activity.tags){
+                            var found = false;
+                            for(var tag in user.tagLikes){
+                                if(tag.tag.equals(activity.tags[i].alias)){
+                                    tag.amount ++;
+                                    found = true;
+                                }
+                            }
+                            if(!found){
+                                user.tagLikes.push({'tag': activity.tags[i].alias, 'amount': 1});
                             }
                         }
-                        if(!found){
-                            user.tagLikes.push({'tag': req.params.tags[i], 'amount': 1});
-                        }
-                    }
-                    user.save();
-                    
+                        user.save();
+                    });                    
                 });
 
             } else{
