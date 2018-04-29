@@ -2,6 +2,11 @@ var mongoose = require('mongoose');
 
 var Activity = require('../activity/Activity');
 
+UserTagLikeSchema = new mongoose.Schema({
+	tag: String,
+	amount: Number
+},{_id: false});
+
 var UserSchema = new mongoose.Schema({  
   _id: Number,
   username: String,
@@ -9,6 +14,7 @@ var UserSchema = new mongoose.Schema({
   friends: [String],
   interests: [String],
   likes: [String],
+  tagLikes: [UserTagLikeSchema],
   dislikes: [String]
 },{ _id: false });
 mongoose.model('User', UserSchema);

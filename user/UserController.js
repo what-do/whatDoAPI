@@ -182,11 +182,30 @@ router.put('/addlike/:id', function (req, res) {
                 }
             }
             if(newLike){
-                var update = { $push: {"likes" : req.body.like}};
+                var update = { $push: {"likes" : req.body.like}};              
                 User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
                     if (err) return res.status(500).send("There was a problem updating the user.");
                     res.status(200).send(user);
                 });
+
+                //Find activites, add to tagLikes  
+                User.findById(req.params.id, function(user){
+                    for(var i in req.params.tags){
+                        var found = false;
+                        for(var tag in user.tagLikes){
+                            if(tag.tag.equals(req.params.tags[i]){
+                                tag.amount ++;
+                                found = true;
+                            }
+                        }
+                        if(!found){
+                            user.tagLikes.push({'tag': req.params.tags[i], 'amount': 1});
+                        }
+                    }
+                    user.save();
+                    
+                });
+
             } else{
                 res.status(404).send("User already liked the activity.");
             }      
