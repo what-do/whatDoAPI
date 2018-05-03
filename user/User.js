@@ -15,7 +15,9 @@ var UserSchema = new mongoose.Schema({
   interests: [String],
   likes: [String],
   tagLikes: [UserTagLikeSchema],
-  dislikes: [String]
+  dislikes: [String],
+  pendingFriendRequests: [String],
+  friendList: [String]
 },{ _id: false });
 mongoose.model('User', UserSchema);
 module.exports = mongoose.model('User');

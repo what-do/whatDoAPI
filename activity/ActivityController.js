@@ -50,10 +50,10 @@ function addTags(parsedTags, activity){
     for(var i = 0; i < parsedTags.length; i++) {
         activity.tags.push(parsedTags[i]);
         //console.log('hello');        
-        // var update = {$inc: {'weight': 1}};
-        // Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
-        //     //console.log(tag);
-        // }).catch();
+        var update = {$inc: {'weight': 1}};
+        Tag.findOneAndUpdate({alias: parsedTags[i].alias}, update, {new: true}, function(err, tag){
+            //console.log(tag);
+        }).catch();
     }
 }
 
