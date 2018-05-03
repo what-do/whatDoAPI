@@ -14,7 +14,7 @@ router.post("/", function (req, res) {
 
     var split = req.body.data.split(',');
     console.log(split.length);
-    for(var i=0;i<split.length;i++){
+    for(var i=0;i<split.length;i= i+2){
         
 
         (function(cntr) {
@@ -23,7 +23,7 @@ router.post("/", function (req, res) {
             query.then(function (oldTag) {
               //if(err) console.log(err.message);
               if(!oldTag){
-                Tag.create({alias: split[cntr], weight: 0}, function(err, tag){
+                Tag.create({alias: split[cntr], name: split[cntr+1], weight: 0}, function(err, tag){
                     if(err) return res.status(500).send("There was a problem adding the tag."); 
                     tag.save();                
                 });
