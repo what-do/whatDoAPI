@@ -96,7 +96,7 @@ const options = {
   }
 };
 
-const req = http.request(options, (res) => {
+const req = https.request(options, (res) => {
   //console.log(`STATUS: ${res.statusCode}`);
   res.setEncoding('utf8');
   res.on('data', (chunk) => {
