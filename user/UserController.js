@@ -240,7 +240,13 @@ router.put('/removelike/:id', function (req, res) {
 
 //Returns activities to populate user feed
 router.get('/activities/:id', function (req, res) {
+    console.log("Conducting User Feed Generation");
     pullAlgorithm.getItems(req.params.id, res);
+});
+
+router.get('/jointactivities/:id/friendId/:friend', function (req, res) {
+    console.log(req.params);
+    pullAlgorithm.getFriendItems(req.params.id, req.params.friend, res);
 });
 
 module.exports = router;

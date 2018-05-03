@@ -18,15 +18,47 @@ module.exports = {
             populateWeights(user, probArray,res);
 
         });
+    },
+    getFriendItems: function(userId, friendId, res){
+        console.log("ID's: ------  " + userId + " " + friendId);
+        User.findById(userId, function (err, user) {
+            if (err) return res.status(500).send("There was a problem finding the user.");
+            if (!user) return res.status(404).send("No user found.");
+            User.findById(friendId, function(err, friend){
+                if (err) return res.status(500).send("There was a problem finding the user.");
+                if (!user) return res.status(404).send("No user found.");
+                var probArray = [];
+
+                updateFriendTagWeights(user, friend, probArray);
+
+                populateWeights(user, probArray, res);
+            });
+            
+
+        });
     }
 };
 
 function updateUserTagWeights(user, probArray){ //Populate an array with tag names based on user likes
    for(var i=0; i<user.interests.length; i++){
-        for(var j=0; j<10; j++){
+        for(var j=0; j<15; j++){
             probArray.push(user.interests[i]);
         }
    } 
+   console.log("Original array \n" + probArray);
+}
+
+function updateFriendTagWeights(user, friend, probArray){ //Populate an array with tag names based on user likes
+   for(var i=0; i<user.interests.length; i++){
+        for(var j=0; j<15; j++){
+            probArray.push(user.interests[i]);
+        }
+   }
+   for(var i=0; i<friend.interests.length; i++){
+        for(var j=0; j<15; j++){
+            probArray.push(friend.interests[i]);
+        }
+   }  
    console.log("Original array \n" + probArray);
 }
 
