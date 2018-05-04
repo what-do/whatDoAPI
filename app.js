@@ -11,8 +11,8 @@ app.use('/activities', ActivityController);
 var TagController = require('./tag/TagController');
 app.use('/tags', TagController);
 
-var YelpHandler = require('./YelpScripting/yelpHandler1');
-app.use('/tasks/yelpScript', YelpHandler);
+// var YelpHandler = require('./YelpScripting/yelpHandler1');
+// app.use('/tasks/yelpScript', YelpHandler);
 
 var FriendRequestController = require('./FriendRequest/FriendRequestController');
 app.use('/friendrequest', FriendRequestController);

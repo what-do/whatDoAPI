@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "jaimegarciae",
   "license": "ISC",
@@ -14,5 +15,14 @@
     "express": "^4.16.3",
     "mongoose": "^5.0.14",
     "wait.for-es6": "^0.1.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/what-do/whatDoAPI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/what-do/whatDoAPI/issues"
+  },
+  "homepage": "https://github.com/what-do/whatDoAPI#readme"
 }

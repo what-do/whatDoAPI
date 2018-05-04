@@ -14,16 +14,16 @@ router.post("/:id", function (req, res) {
         if(!(~user.friendList.indexOf(req.body.recipient))){
             FriendRequest.findOne({_id: req.params.id, recipient: req.body.recipient}, function(freq){
                 if(!freq){
-                    User.findById(req.body.recipient, function(err, recipient){
+                    User.findOne({username: req.body.recipient}, function(err, recipient){
                         //console.log(recipient);
-                        FriendRequest.create({_id: req.params.id, senderName: user.username, recipient: req.body.recipient, recipName: recipient.username}, function(err, friendRequest){ //Search for an existing friend request, if none exists create one
+                        FriendRequest.create({_id: req.params.id, senderName: user.username, recipient: recipient._id, recipName: recipient.username}, function(err, friendRequest){ //Search for an existing friend request, if none exists create one
                             if(err) return res.status(500).send("There was a problem adding the information to the database.");
-                            var update1 = {$push: {outgoingFriendRequests: {id: req.body.recipient, name: recipient.username}}};
+                            var update1 = {$push: {outgoingFriendRequests: {id: recipient._id, name: recipient.username}}};
                             var update2 = {$push: {incomingFriendRequests: {id: req.params.id, name: user.username}}};
                             User.findByIdAndUpdate(req.params.id, update1, function(err, outRequest){ //Update user request lists
                                 if(err) console.log(err);
                             });
-                            User.findByIdAndUpdate(req.body.recipient, update2, function(err, incRequest){
+                            User.findByIdAndUpdate(recipient._id, update2, function(err, incRequest){
                                 if(err) console.log(err);
                             });
                             res.status(200).send(friendRequest);
@@ -40,7 +40,7 @@ router.post("/:id", function (req, res) {
 
 //Returns all requests for a user
 router.get('/:id', function (req, res) {
-    User.find({recipient: req.params.id}, 
+    FriendRequest.find({recipient: req.params.id}, 
         function (err, requests) {
             if (err) return res.status(500).send("There was a problem finding the requests.");
             res.status(200).send(requests);
@@ -49,9 +49,9 @@ router.get('/:id', function (req, res) {
 });
 
 router.post("/respond/:id", function (req, res) {
-    FriendRequest.findOneAndRemove({_id: req.body.sender, recipient: req.params.id }, function(err, friendRequest){
+    FriendRequest.findOneAndRemove({senderName: req.body.sender, recipName: req.params.id }, function(err, friendRequest){
         //console.log("---------------" + friendRequest);
-        FriendRequest.remove({_id: req.params.id, recipient: req.body.sender }, function(err){
+        FriendRequest.remove({senderName: req.params.id, recipName: req.body.sender }, function(err){
         if(err) console.log(err); //1: original sender, 2: original recipient
         //console.log('Updating user lists');
         var update1 = {$pull: {outgoingFriendRequests: {id: req.params.id}, incomingFriendRequests: {id: req.params.id}}}; //If declined, remove friend request from each users outgoing and incoming lists
@@ -62,11 +62,11 @@ router.post("/respond/:id", function (req, res) {
             update2 = {$pull: {incomingFriendRequests: {id: req.body.sender}, outgoingFriendRequests: {id: req.body.sender}}, $push:{friendList: {id: req.body.sender, username: friendRequest.senderName}}};
 
         }
-        User.findByIdAndUpdate(req.params.id, update2, function(err, outRequest){ //Update user request lists
+        User.findAndUpdate({username: req.params.id}, update2, function(err, outRequest){ //Update user request lists
             if(err) console.log(err);
             //console.log('Sender Updated');
         });
-        User.findByIdAndUpdate(req.body.sender, update1, function(err, incRequest){
+        User.findAndUpdate({username: req.params.id}, update1, function(err, incRequest){
             if(err) console.log(err);
             //console.log('Recipient Updated');
         });
@@ -74,6 +74,25 @@ router.post("/respond/:id", function (req, res) {
 
         });
     });
+});
+
+router.post("/remove/:id", function (req, res){
+    var update1 = {$pull: {friendList: {username: req.body.friend}}};
+    var update2 = {$pull: {friendList: {id: req.params.id}}};
+    User.findByIdAndUpdate(req.params.id, update1, function(err, user1){
+        console.log("Deleted " + req.body.friend + " from friend list");
+    });
+    User.findOneAndUpdate({username: req.body.friend}, update2, function(err, user2){
+        if(user2) {
+            console.log("Deleted user with ID " + req.params.id + " from friend list");
+            res.status(200).send("Friend remove complete");
+        }
+        else{
+            console.log(req.body.friend + " does not match a username in our database");
+            res.status(500).send(req.body.friend + " does not match a username in our database");
+        } 
+    });
+    
 });
 
 module.exports = router;

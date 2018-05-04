@@ -15,6 +15,7 @@ UserTagLikeSchema = new mongoose.Schema({
 var UserSchema = new mongoose.Schema({  
   _id: Number,
   username: String,
+  displayname: String,
   email: String,
   interests: [String],
   likes: [String],

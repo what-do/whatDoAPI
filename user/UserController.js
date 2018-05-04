@@ -19,6 +19,7 @@ router.post("/", function (req, res) {
                 {
                     _id: req.body.id,
                     username: req.body.username,
+                    displayname: req.body.displayname,
                     email: req.body.email,
                     friends: [],
                     interests: [],
