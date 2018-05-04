@@ -21,10 +21,14 @@ router.post("/", function (req, res) {
                     username: req.body.username,
                     displayname: req.body.displayname,
                     email: req.body.email,
-                    friends: [],
+                    friendList: [],
                     interests: [],
                     likes: [],
-                    dislikes: []
+                    dislikes: [],
+                    tagLikes: [],
+                    outgoingFriendRequests: [],
+                    incomingFriendRequests: [],
+
                 }, function(err, user) {
                     if(err) return res.status(500).send("There was a problem adding the information to the database.");
                     if(req.body.interests) addInterests(JSON.parse(req.body.interests), user);
@@ -184,20 +188,20 @@ router.put('/addlike/:id', function (req, res) {
                 }
             }
             if(newLike){
-                var update = { $push: {"likes" : req.body.like}};              
+                var update = { $push: {'likes' : req.body.like}};              
                 User.findByIdAndUpdate(req.params.id, update, {new: true}, function (err, user) {
                     if (err) return res.status(500).send("There was a problem updating the user.");
                     res.status(200).send(user);
                 });
 
                 //Find activites, add to tagLikes  
-                User.findById(req.params.id, function(user){
-                    Activity.findOne({"yelp": req.body.like}, function(activity){
+                User.findById(req.params.id, function(err, user){
+                    Activity.findOne({'yelp': user.likes[user.likes.length-1]}, function(err, activity){
                         if(activity){
                             for(var i in activity.tags){
                                 var found = false;
                                 for(var tag in user.tagLikes){
-                                    if(tag.tag.equals(activity.tags[i].alias)){
+                                    if(tag.tag == activity.tags[i].alias){
                                         tag.amount ++;
                                         found = true;
                                     }
