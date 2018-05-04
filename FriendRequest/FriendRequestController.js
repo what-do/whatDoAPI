@@ -37,7 +37,7 @@ router.post("/:id", function (req, res) {
              });
          }
          else{
-            res.status(500).send("Friend request already exists");
+            res.status(500).send("Friend already exists");
          }
     });
 
